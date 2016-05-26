@@ -1,8 +1,24 @@
-package com.jtransc.dynarec;
+package com.jtransc.dynarec.evaluators;
+
+import com.jtransc.dynarec.AnyInvoke;
+import com.jtransc.dynarec.Expr;
+import com.jtransc.dynarec.Function;
+import com.jtransc.dynarec.Stm;
 
 public class Interpreter {
 	Object result;
 	boolean completed = false;
+
+	static public AnyInvoke compile(final Function function) {
+		return new AnyInvoke() {
+			final Interpreter interpreter = new Interpreter();
+
+			@Override
+			public Object invoke(Object... params) {
+				return interpreter.interpret(function);
+			}
+		};
+	}
 
 	public Object interpret(Function function) {
 		interpret(function.stm);

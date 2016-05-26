@@ -1,5 +1,9 @@
 package com.jtransc.dynarec;
 
+import com.jtransc.JTranscSystem;
+import com.jtransc.dynarec.evaluators.Interpreter;
+import com.jtransc.dynarec.evaluators.JavascriptCompiler;
+
 public class Function {
 	public final Stm stm;
 
@@ -8,15 +12,11 @@ public class Function {
 	}
 
 	public AnyInvoke compile() {
-		final Function function = this;
-		return new AnyInvoke() {
-			final Interpreter interpreter = new Interpreter();
-
-			@Override
-			public Object invoke(Object... params) {
-				return interpreter.interpret(function);
-			}
-		};
+		if (JTranscSystem.isJs()) {
+			return JavascriptCompiler.compile(this);
+		} else {
+			return Interpreter.compile(this);
+		}
 	}
 
 	public <T> T compile(Class<T> clazz) {
