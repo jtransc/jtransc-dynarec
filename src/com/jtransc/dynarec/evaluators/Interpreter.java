@@ -37,6 +37,18 @@ public class Interpreter {
 	private Object interpret(Expr expr) {
 		if (expr instanceof Expr.IntLiteral) {
 			return ((Expr.IntLiteral) expr).value;
+		} else if (expr instanceof Expr.Binop) {
+			final Expr.Binop binop = (Expr.Binop) expr;
+			Object left = interpret(binop.left);
+			Object right = interpret(binop.right);
+			switch (binop.op) {
+				case IADD:
+					return ((Integer) left) + ((Integer) right);
+				case ISUB:
+					return ((Integer) left) - ((Integer) right);
+				default:
+					throw new RuntimeException("Not implemented binary operator " + binop.op);
+			}
 		} else {
 			throw new RuntimeException("Unknown expr " + expr);
 		}

@@ -8,4 +8,20 @@ public interface Expr {
 			this.value = value;
 		}
 	}
+
+	class Binop implements Expr {
+		public enum Operator {
+			IADD, ISUB;
+		}
+
+		public final Expr left;
+		public final Operator op;
+		public final Expr right;
+
+		public Binop(Expr left, Operator op, Expr right) {
+			this.left = left;
+			this.op = op;
+			this.right = right;
+		}
+	}
 }
