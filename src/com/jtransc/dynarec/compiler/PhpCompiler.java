@@ -1,9 +1,10 @@
-package com.jtransc.dynarec.evaluators;
+package com.jtransc.dynarec.compiler;
 
 import com.jtransc.annotation.haxe.HaxeMethodBody;
 import com.jtransc.dynarec.*;
+import com.jtransc.dynarec.util.AstVisitor;
 
-public class JavascriptCompiler extends FunctionCompiler {
+public class PhpCompiler extends FunctionCompiler {
 	public static String generateCode(Function function) {
 		Impl compiler = new Impl();
 		compiler.visit(function);
@@ -20,8 +21,8 @@ public class JavascriptCompiler extends FunctionCompiler {
 		};
 	}
 
-	// @TODO: Instead of evaluating everytime, generate the function and return it!
-	@HaxeMethodBody(target = "js", value = "return HaxeNatives.box(untyped __js__('eval({0} + {1} + {2})', '(function() {', p0._str, '})()'));")
+	// @TODO: Instead of evaluating every time, generate the function and return it!
+	@HaxeMethodBody(target = "php", value = "return HaxeNatives.box(untyped __php__('eval({0})', p0._str));")
 	native static private Object eval(String str);
 
 	static private class Impl extends AstVisitor {

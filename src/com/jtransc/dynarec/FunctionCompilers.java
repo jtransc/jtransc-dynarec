@@ -1,9 +1,10 @@
 package com.jtransc.dynarec;
 
 import com.jtransc.JTranscSystem;
-import com.jtransc.dynarec.evaluators.InterpreterCompiler;
-import com.jtransc.dynarec.evaluators.JavascriptCompiler;
-import com.jtransc.dynarec.evaluators.JvmCompiler;
+import com.jtransc.dynarec.compiler.InterpreterCompiler;
+import com.jtransc.dynarec.compiler.JavascriptCompiler;
+import com.jtransc.dynarec.compiler.JvmCompiler;
+import com.jtransc.dynarec.compiler.PhpCompiler;
 
 public class FunctionCompilers {
 	static public FunctionCompiler getSuitableCompiler() {
@@ -11,6 +12,8 @@ public class FunctionCompilers {
 			return new JavascriptCompiler();
 		} else if (JTranscSystem.isJava()) {
 			return new JvmCompiler();
+		} else if (JTranscSystem.isPhp()) {
+			return new PhpCompiler();
 		} else {
 			return new InterpreterCompiler();
 		}
