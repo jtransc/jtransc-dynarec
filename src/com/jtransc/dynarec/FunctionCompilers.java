@@ -10,9 +10,9 @@ public class FunctionCompilers {
 	static public FunctionCompiler getSuitableCompiler() {
 		if (JTranscSystem.isJs()) {
 			return new JavascriptCompiler();
-		} else if (JTranscSystem.isJava()) {
+		} /*else if (JTranscSystem.isJava()) {
 			return new JvmCompiler();
-		} else if (JTranscSystem.isPhp()) {
+		} */else if (JTranscSystem.isPhp()) {
 			return new PhpCompiler();
 		} else {
 			return new InterpreterCompiler();

@@ -1,5 +1,8 @@
 package com.jtransc.dynarec;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+
 public interface Expr {
 	interface Literal extends Expr {
 		Object getValue();
@@ -31,7 +34,10 @@ public interface Expr {
 
 	class Binop implements Expr {
 		public enum Operator {
-			IADD, ISUB;
+			IADD, // +
+			ISUB, // -
+			NE    // !=
+			;
 		}
 
 		public final Expr left;
@@ -45,11 +51,41 @@ public interface Expr {
 		}
 	}
 
-	public class Local implements Expr {
+	class Local implements Expr {
 		public final com.jtransc.dynarec.Local local;
 
 		public Local(com.jtransc.dynarec.Local local) {
 			this.local = local;
+		}
+	}
+
+	class GETARRAY implements Expr {
+		public final Expr array;
+		public final Expr index;
+
+		public GETARRAY(Expr array, Expr index) {
+			this.array = array;
+			this.index = index;
+		}
+	}
+
+	class NEWARRAY implements Expr {
+		public final Class<?> type;
+		public final Expr size;
+
+		public NEWARRAY(Class<?> type, Expr size) {
+			this.type = type;
+			this.size = size;
+		}
+	}
+
+	class CALLSTATIC implements Expr {
+		public final Method method;
+		public final Expr[] args;
+
+		public CALLSTATIC(Method method, Expr[] args) {
+			this.method = method;
+			this.args = args;
 		}
 	}
 }

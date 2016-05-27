@@ -23,10 +23,28 @@ public interface Stm {
 		}
 	}
 
+	class While implements Stm {
+		public final Expr cond;
+		public final Stm body;
+
+		public While(Expr cond, Stm body) {
+			this.cond = cond;
+			this.body = body;
+		}
+	}
+
 	class Return implements Stm {
 		public final Expr expr;
 
 		public Return(Expr expr) {
+			this.expr = expr;
+		}
+	}
+
+	class StmExpr implements Stm {
+		public final Expr expr;
+
+		public StmExpr(Expr expr) {
 			this.expr = expr;
 		}
 	}
@@ -46,6 +64,18 @@ public interface Stm {
 		public SetLocal(Local local, Expr expr) {
 			this.local = local;
 			this.expr = expr;
+		}
+	}
+
+	class SETARRAY implements Stm {
+		public final Expr array;
+		public final Expr index;
+		public final Expr value;
+
+		public SETARRAY(Expr array, Expr index, Expr value) {
+			this.array = array;
+			this.index = index;
+			this.value = value;
 		}
 	}
 }

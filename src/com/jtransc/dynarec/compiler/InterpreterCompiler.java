@@ -2,6 +2,8 @@ package com.jtransc.dynarec.compiler;
 
 import com.jtransc.dynarec.*;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 
 public class InterpreterCompiler extends FunctionCompiler {
@@ -49,6 +51,20 @@ public class InterpreterCompiler extends FunctionCompiler {
 			} else if (stm instanceof Stm.SetLocal) {
 				Stm.SetLocal setlocal = (Stm.SetLocal) stm;
 				locals.put(setlocal.local, interpret(setlocal.expr));
+			} else if (stm instanceof Stm.SETARRAY) {
+				Object array = interpret(((Stm.SETARRAY) stm).array);
+				int index = (Integer) interpret(((Stm.SETARRAY) stm).index);
+				Object value = interpret(((Stm.SETARRAY) stm).value);
+				Array.set(array, index, value);
+			} else if (stm instanceof Stm.While) {
+				Expr cond = ((Stm.While) stm).cond;
+				Stm body = ((Stm.While) stm).body;
+				while ((Boolean) interpret(cond)) {
+					interpret(body);
+					if (completed) return;
+				}
+			} else if (stm instanceof Stm.StmExpr) {
+				interpret(((Stm.StmExpr) stm).expr);
 			} else {
 				throw new RuntimeException("Unknown stm " + stm);
 			}
@@ -68,8 +84,30 @@ public class InterpreterCompiler extends FunctionCompiler {
 						return ((Integer) left) + ((Integer) right);
 					case ISUB:
 						return ((Integer) left) - ((Integer) right);
+					case NE:
+						return ((Comparable)left).compareTo(right) != 0;
 					default:
 						throw new RuntimeException("Not implemented binary operator " + binop.op);
+				}
+			} else if (expr instanceof Expr.NEWARRAY) {
+				Class<?> type = ((Expr.NEWARRAY) expr).type;
+				int size = (Integer) interpret(((Expr.NEWARRAY) expr).size);
+				return Array.newInstance(type, size);
+			} else if (expr instanceof Expr.GETARRAY) {
+				Object array = interpret(((Expr.GETARRAY) expr).array);
+				int index = (Integer) interpret(((Expr.GETARRAY) expr).index);
+				return Array.get(array, index);
+			} else if (expr instanceof Expr.CALLSTATIC) {
+				Method method = ((Expr.CALLSTATIC) expr).method;
+				Expr[] argsExpr = ((Expr.CALLSTATIC) expr).args;
+				Object[] args = new Object[argsExpr.length];
+				for (int n = 0; n < args.length; n++) {
+					args[n] = interpret(argsExpr[n]);
+				}
+				try {
+					return method.invoke(null, args);
+				} catch (Throwable t) {
+					throw new RuntimeException(t);
 				}
 			} else {
 				throw new RuntimeException("Unknown expr " + expr);

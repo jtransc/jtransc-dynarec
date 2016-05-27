@@ -1,13 +1,26 @@
 package com.jtransc.dynarec.builder;
 
+import com.jtransc.annotation.JTranscInvisible;
 import com.jtransc.dynarec.Expr;
 import com.jtransc.dynarec.Function;
 import com.jtransc.dynarec.Local;
 import com.jtransc.dynarec.Stm;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+
+@JTranscInvisible
 public class FunctionBuilder {
 	static public Expr.Binop IADD(Expr left, Expr right) {
 		return new Expr.Binop(left, Expr.Binop.Operator.IADD, right);
+	}
+
+	static public Expr.Binop ISUB(Expr left, Expr right) {
+		return new Expr.Binop(left, Expr.Binop.Operator.ISUB, right);
+	}
+
+	static public Expr.Binop NE(Expr left, Expr right) {
+		return new Expr.Binop(left, Expr.Binop.Operator.NE, right);
 	}
 
 	static public Expr.IntLiteral INT(int value) {
@@ -26,8 +39,16 @@ public class FunctionBuilder {
 		return new Stm.If(cond, body);
 	}
 
+	static public Stm.While WHILE(Expr cond, Stm body) {
+		return new Stm.While(cond, body);
+	}
+
 	static public Stm.IfElse IF(Expr cond, Stm strue, Stm sfalse) {
 		return new Stm.IfElse(cond, strue, sfalse);
+	}
+
+	static public Stm STM(Expr expr) {
+		return new Stm.StmExpr(expr);
 	}
 
 	static public Stm STMS(Stm... items) {
@@ -49,4 +70,22 @@ public class FunctionBuilder {
 	static public Stm.SetLocal SETLOCAL(Local local, Expr expr) {
 		return new Stm.SetLocal(local, expr);
 	}
+
+	static public Expr GETARRAY(Expr array, Expr index) {
+		return new Expr.GETARRAY(array, index);
+	}
+
+	static public Stm SETARRAY(Expr array, Expr index, Expr value) {
+		return new Stm.SETARRAY(array, index, value);
+	}
+
+	static public Expr CALLSTATIC(Method method, Expr... args) {
+		return new Expr.CALLSTATIC(method, args);
+	}
+
+
+	static public Expr NEWARRAY(Class<?> type, Expr size) {
+		return new Expr.NEWARRAY(type, size);
+	}
+
 }
