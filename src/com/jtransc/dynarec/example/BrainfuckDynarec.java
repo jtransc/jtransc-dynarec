@@ -1,6 +1,7 @@
 package com.jtransc.dynarec.example;
 
 import com.jtransc.dynarec.*;
+import com.jtransc.dynarec.compiler.JavascriptCompiler;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -11,8 +12,13 @@ public class BrainfuckDynarec {
 	static public void main(String[] args) {
 		String helloWorld = "++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>.>---.+++++++..+++.>>.<-.<.+++.------.--------.>>+.>++.";
 		FunctionCompiler suitableCompiler = FunctionCompilers.getSuitableCompiler();
-		AnyInvoke function = suitableCompiler.compile(FUNCTION(BrainfuckCompiler.generateAst(helloWorld)));
-		function.invoke();
+		Function function = FUNCTION(BrainfuckCompiler.generateAst(helloWorld));
+		AnyInvoke invokable = suitableCompiler.compile(function);
+
+		//BrainfuckRuntime.putchar('!');
+		//System.out.println(JavascriptCompiler.generateCode(function));
+
+		invokable.invoke();
 	}
 
 	static public class BrainfuckRuntime {

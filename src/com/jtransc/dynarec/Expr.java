@@ -59,31 +59,31 @@ public interface Expr {
 		}
 	}
 
-	class GETARRAY implements Expr {
+	class GetArray implements Expr {
 		public final Expr array;
 		public final Expr index;
 
-		public GETARRAY(Expr array, Expr index) {
+		public GetArray(Expr array, Expr index) {
 			this.array = array;
 			this.index = index;
 		}
 	}
 
-	class NEWARRAY implements Expr {
+	class NewArray implements Expr {
 		public final Class<?> type;
 		public final Expr size;
 
-		public NEWARRAY(Class<?> type, Expr size) {
+		public NewArray(Class<?> type, Expr size) {
 			this.type = type;
 			this.size = size;
 		}
 	}
 
-	class CALLSTATIC implements Expr {
+	class InvokeStatic implements Expr {
 		public final Method method;
 		public final Expr[] args;
 
-		public CALLSTATIC(Method method, Expr[] args) {
+		public InvokeStatic(Method method, Expr[] args) {
 			this.method = method;
 			this.args = args;
 		}

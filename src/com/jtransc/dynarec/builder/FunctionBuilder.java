@@ -7,7 +7,6 @@ import com.jtransc.dynarec.Local;
 import com.jtransc.dynarec.Stm;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 
 @JTranscInvisible
 public class FunctionBuilder {
@@ -72,20 +71,20 @@ public class FunctionBuilder {
 	}
 
 	static public Expr GETARRAY(Expr array, Expr index) {
-		return new Expr.GETARRAY(array, index);
+		return new Expr.GetArray(array, index);
 	}
 
 	static public Stm SETARRAY(Expr array, Expr index, Expr value) {
-		return new Stm.SETARRAY(array, index, value);
+		return new Stm.SetArray(array, index, value);
 	}
 
 	static public Expr CALLSTATIC(Method method, Expr... args) {
-		return new Expr.CALLSTATIC(method, args);
+		return new Expr.InvokeStatic(method, args);
 	}
 
 
 	static public Expr NEWARRAY(Class<?> type, Expr size) {
-		return new Expr.NEWARRAY(type, size);
+		return new Expr.NewArray(type, size);
 	}
 
 }

@@ -3,6 +3,7 @@ package com.jtransc.dynarec.compiler;
 import com.jtransc.annotation.haxe.HaxeMethodBody;
 import com.jtransc.dynarec.*;
 import com.jtransc.dynarec.util.AstVisitor;
+import com.jtransc.dynarec.util.JTranscReflection;
 import com.jtransc.dynarec.util.LocalNamer;
 
 public class JavascriptCompiler extends FunctionCompiler {
@@ -58,7 +59,7 @@ public class JavascriptCompiler extends FunctionCompiler {
 		@Override
 		public void visit(Stm.SetLocal stm) {
 			visit(stm.local);
-			sb.append("=");
+			sb.append(" = ");
 			visit(stm.expr);
 			sb.append(";");
 		}
@@ -71,6 +72,9 @@ public class JavascriptCompiler extends FunctionCompiler {
 					break;
 				case ISUB:
 					sb.append("-");
+					break;
+				case NE:
+					sb.append("!=");
 					break;
 				default:
 					throw new RuntimeException("Invalid binary operator " + op);
@@ -107,8 +111,32 @@ public class JavascriptCompiler extends FunctionCompiler {
 		}
 
 		@Override
-		public void visit(Expr.Literal expr) {
+		public void visit(Stm.While stm) {
+			sb.append("while (");
+			visit(stm.cond);
+			sb.append(")");
+			visit(stm.body);
+		}
+
+		@Override
+		public void visit(Expr.IntLiteral expr) {
 			sb.append(expr.getValue());
+		}
+
+		@Override
+		public void visit(Expr.BoolLiteral expr) {
+			sb.append(expr.getValue());
+		}
+
+		@Override
+		public void visit(Stm.StmExpr stm) {
+			visit(stm.expr);
+			sb.append(";");
+		}
+
+		@Override
+		public void visit(Expr.Local expr) {
+			visit(expr.local);
 		}
 
 		@Override
@@ -116,26 +144,54 @@ public class JavascriptCompiler extends FunctionCompiler {
 			sb.append(localNamer.get(local));
 		}
 
-		private void generate(Stm stm) {
-			if (stm instanceof Stm.Return) {
-				sb.append("return ");
-				generate(((Stm.Return) stm).expr);
-				sb.append(";");
-			} else {
-				throw new RuntimeException("Unknown stm " + stm);
-			}
+		@Override
+		public void visit(Expr.NewArray expr) {
+			//super.visit(expr);
+			// TODO: Use type!
+			sb.append("new Int8Array(");
+			visit(expr.size);
+			sb.append(")");
 		}
 
-		private void generate(Expr expr) {
-			if (expr instanceof Expr.IntLiteral) {
-				sb.append(((Expr.IntLiteral) expr).value);
-			} else if (expr instanceof Expr.Binop) {
-				Expr.Binop binop = ((Expr.Binop) expr);
-				generate(binop.left);
-				generate(binop.right);
-			} else {
-				throw new RuntimeException("Unknown expr " + expr);
+		@Override
+		public void visit(Stm.SetArray stm) {
+			visit(stm.array);
+			sb.append("[");
+			visit(stm.index);
+			sb.append("] = ");
+			visit(stm.value);
+			sb.append(";");
+		}
+
+		@Override
+		public void visit(Expr.GetArray expr) {
+			visit(expr.array);
+			sb.append("[");
+			visit(expr.index);
+			sb.append("]");
+		}
+
+		private String convertToJavascriptName(String clazzName) {
+			return clazzName.replace("_", "_$").replace('.', '_');
+
+			// com_jtransc_dynarec_example_BrainfuckDynarec$BrainfuckRuntime$
+			// com_jtransc_dynarec_example_BrainfuckDynarec_$BrainfuckRuntime_$
+		}
+
+		@Override
+		public void visit(Expr.InvokeStatic expr) {
+			String internalClassName = convertToJavascriptName(JTranscReflection.getInternalName(expr.method.getDeclaringClass()));
+			String internalMethodName = JTranscReflection.getInternalName(expr.method);
+			//com_jtransc_dynarec_example_BrainfuckDynarec_$BrainfuckRuntime_$
+			sb.append(internalClassName);
+			sb.append(".");
+			sb.append(internalMethodName);
+			sb.append("(");
+			for (int n = 0; n < expr.args.length; n++) {
+				if (n != 0) sb.append(", ");
+				visit(expr.args[n]);
 			}
+			sb.append(")");
 		}
 	}
 }

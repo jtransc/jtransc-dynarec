@@ -5,22 +5,30 @@ import com.jtransc.dynarec.Function;
 import com.jtransc.dynarec.Local;
 import com.jtransc.dynarec.Stm;
 
+import java.lang.reflect.Method;
+
 public class AstVisitor {
 	public void visit(Function function) {
 		visit(function.stm);
 	}
 
-	public void visit(Stm stm) {
+	final public void visit(Stm stm) {
 		if (stm instanceof Stm.Return) {
 			visit((Stm.Return)stm);
 		} else if (stm instanceof Stm.Stms) {
 			visit((Stm.Stms)stm);
+		} else if (stm instanceof Stm.StmExpr) {
+			visit((Stm.StmExpr)stm);
 		} else if (stm instanceof Stm.If) {
 			visit((Stm.If)stm);
-		} else if (stm instanceof Stm.SetLocal) {
-			visit((Stm.SetLocal)stm);
 		} else if (stm instanceof Stm.IfElse) {
 			visit((Stm.IfElse)stm);
+		} else if (stm instanceof Stm.While) {
+			visit((Stm.While)stm);
+		} else if (stm instanceof Stm.SetLocal) {
+			visit((Stm.SetLocal)stm);
+		} else if (stm instanceof Stm.SetArray) {
+			visit((Stm.SetArray)stm);
 		} else {
 			throw new RuntimeException("Unknown stm " + stm);
 		}
@@ -32,9 +40,19 @@ public class AstVisitor {
 		}
 	}
 
+	public void visit(Stm.StmExpr stm) {
+		visit(stm.expr);
+	}
+
 	public void visit(Stm.SetLocal stm) {
 		visit(stm.local);
 		visit(stm.expr);
+	}
+
+	public void visit(Stm.SetArray stm) {
+		visit(stm.array);
+		visit(stm.index);
+		visit(stm.value);
 	}
 
 	public void visit(Stm.Return stm) {
@@ -52,19 +70,53 @@ public class AstVisitor {
 		visit(stm.sfalse);
 	}
 
-	public void visit(Expr expr) {
+	public void visit(Stm.While stm) {
+		visit(stm.cond);
+		visit(stm.body);
+	}
+
+	final public void visit(Expr expr) {
 		if (expr instanceof Expr.Literal) {
 			visit((Expr.Literal)expr);
 		} else if (expr instanceof Expr.Local) {
 			visit((Expr.Local)expr);
 		} else if (expr instanceof Expr.Binop) {
 			visit((Expr.Binop)expr);
+		} else if (expr instanceof Expr.NewArray) {
+			visit((Expr.NewArray)expr);
+		} else if (expr instanceof Expr.GetArray) {
+			visit((Expr.GetArray)expr);
+		} else if (expr instanceof Expr.InvokeStatic) {
+			visit((Expr.InvokeStatic)expr);
 		} else {
 			throw new RuntimeException("Unknown expr " + expr);
 		}
 	}
 
-	public void visit(Expr.Literal expr) {
+	public void visit(Class<?> type) {
+	}
+
+	public void visit(Method method) {
+	}
+
+	public void visit(Expr.NewArray expr) {
+		visit(expr.type);
+		visit(expr.size);
+	}
+
+	public void visit(Expr.GetArray expr) {
+		visit(expr.array);
+		visit(expr.index);
+	}
+
+	public void visit(Expr.InvokeStatic expr) {
+		visit(expr.method);
+		for (Expr arg : expr.args) {
+			visit(arg);
+		}
+	}
+
+	final public void visit(Expr.Literal expr) {
 		if (expr instanceof Expr.IntLiteral) {
 			visit((Expr.IntLiteral)expr);
 		} else if (expr instanceof Expr.BoolLiteral) {

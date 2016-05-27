@@ -2,7 +2,8 @@ apply plugin: "java"
 apply plugin: 'application'
 apply plugin: "jtransc"
 
-mainClassName = "com.jtransc.dynarec.example.DynarecExample"
+//mainClassName = "com.jtransc.dynarec.example.DynarecExample"
+mainClassName = "com.jtransc.dynarec.example.BrainfuckDynarec"
 
 sourceSets.main {
     java {

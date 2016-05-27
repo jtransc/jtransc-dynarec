@@ -51,10 +51,10 @@ public class InterpreterCompiler extends FunctionCompiler {
 			} else if (stm instanceof Stm.SetLocal) {
 				Stm.SetLocal setlocal = (Stm.SetLocal) stm;
 				locals.put(setlocal.local, interpret(setlocal.expr));
-			} else if (stm instanceof Stm.SETARRAY) {
-				Object array = interpret(((Stm.SETARRAY) stm).array);
-				int index = (Integer) interpret(((Stm.SETARRAY) stm).index);
-				Object value = interpret(((Stm.SETARRAY) stm).value);
+			} else if (stm instanceof Stm.SetArray) {
+				Object array = interpret(((Stm.SetArray) stm).array);
+				int index = (Integer) interpret(((Stm.SetArray) stm).index);
+				Object value = interpret(((Stm.SetArray) stm).value);
 				Array.set(array, index, value);
 			} else if (stm instanceof Stm.While) {
 				Expr cond = ((Stm.While) stm).cond;
@@ -89,17 +89,17 @@ public class InterpreterCompiler extends FunctionCompiler {
 					default:
 						throw new RuntimeException("Not implemented binary operator " + binop.op);
 				}
-			} else if (expr instanceof Expr.NEWARRAY) {
-				Class<?> type = ((Expr.NEWARRAY) expr).type;
-				int size = (Integer) interpret(((Expr.NEWARRAY) expr).size);
+			} else if (expr instanceof Expr.NewArray) {
+				Class<?> type = ((Expr.NewArray) expr).type;
+				int size = (Integer) interpret(((Expr.NewArray) expr).size);
 				return Array.newInstance(type, size);
-			} else if (expr instanceof Expr.GETARRAY) {
-				Object array = interpret(((Expr.GETARRAY) expr).array);
-				int index = (Integer) interpret(((Expr.GETARRAY) expr).index);
+			} else if (expr instanceof Expr.GetArray) {
+				Object array = interpret(((Expr.GetArray) expr).array);
+				int index = (Integer) interpret(((Expr.GetArray) expr).index);
 				return Array.get(array, index);
-			} else if (expr instanceof Expr.CALLSTATIC) {
-				Method method = ((Expr.CALLSTATIC) expr).method;
-				Expr[] argsExpr = ((Expr.CALLSTATIC) expr).args;
+			} else if (expr instanceof Expr.InvokeStatic) {
+				Method method = ((Expr.InvokeStatic) expr).method;
+				Expr[] argsExpr = ((Expr.InvokeStatic) expr).args;
 				Object[] args = new Object[argsExpr.length];
 				for (int n = 0; n < args.length; n++) {
 					args[n] = interpret(argsExpr[n]);

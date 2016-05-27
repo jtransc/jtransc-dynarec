@@ -67,12 +67,12 @@ public interface Stm {
 		}
 	}
 
-	class SETARRAY implements Stm {
+	class SetArray implements Stm {
 		public final Expr array;
 		public final Expr index;
 		public final Expr value;
 
-		public SETARRAY(Expr array, Expr index, Expr value) {
+		public SetArray(Expr array, Expr index, Expr value) {
 			this.array = array;
 			this.index = index;
 			this.value = value;
