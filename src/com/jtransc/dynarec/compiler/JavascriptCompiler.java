@@ -173,16 +173,9 @@ public class JavascriptCompiler extends FunctionCompiler {
 			sb.append("]");
 		}
 
-		private String convertToJavascriptName(String clazzName) {
-			return clazzName.replace("_", "_$").replace('.', '_');
-
-			// com_jtransc_dynarec_example_BrainfuckDynarec$BrainfuckRuntime$
-			// com_jtransc_dynarec_example_BrainfuckDynarec_$BrainfuckRuntime_$
-		}
-
 		@Override
 		public void visit(Expr.InvokeStatic expr) {
-			String internalClassName = convertToJavascriptName(JTranscReflection.getInternalName(expr.method.getDeclaringClass()));
+			String internalClassName = JTranscReflection.getInternalName(expr.method.getDeclaringClass());
 			String internalMethodName = JTranscReflection.getInternalName(expr.method);
 			//com_jtransc_dynarec_example_BrainfuckDynarec_$BrainfuckRuntime_$
 			sb.append(internalClassName);
