@@ -2,3 +2,7 @@
 /.gradle
 /target
 /build
+*.versionsBackup
+*.iml
+*.iws
+*.ipr
