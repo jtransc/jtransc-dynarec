@@ -1,9 +1,14 @@
 apply plugin: "java"
 apply plugin: 'application'
 apply plugin: "jtransc"
+apply plugin: 'maven'
+apply plugin: 'signing'
 
 //mainClassName = "com.jtransc.dynarec.example.DynarecExample"
 mainClassName = "com.jtransc.dynarec.example.BrainfuckDynarec"
+
+group = "com.jtransc"
+version = "${jtranscVersion}"
 
 sourceSets.main {
     java {
@@ -17,7 +22,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "com.jtransc:jtransc-gradle-plugin:0.2.8"
+        classpath "com.jtransc:jtransc-gradle-plugin:${jtranscVersion}"
     }
 }
 
@@ -27,7 +32,71 @@ repositories {
 }
 
 dependencies {
-    compile 'com.jtransc:jtransc-rt-core:0.2.8'
+    compile "com.jtransc:jtransc-rt-core:${jtranscVersion}"
     compile 'org.ow2.asm:asm-all:5.0.3'
     testCompile group: 'junit', name: 'junit', version: '4.+'
+}
+
+
+//////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from 'build/docs/javadoc'
+}
+
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+artifacts {
+    archives jar
+    archives javadocJar
+    archives sourcesJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
+            }
+
+            pom.project {
+                name "${project.name}"
+                packaging 'jar'
+                description 'JVM AOT compiler currently generating Javascript and Haxe, with initial focus on Kotlin and games.'
+                url 'https://github.com/jtransc/jtransc-media/'
+
+                scm {
+                    url 'scm:git@github.com:jtransc/jtransc-media.git'
+                    connection 'scm:git@github.com:jtransc/jtransc-media.git'
+                    developerConnection 'scm:git@github.com:jtransc/jtransc-media.git'
+                }
+
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'soywiz'
+                        name 'Carlos Ballesteros Velasco'
+                    }
+                }
+            }
+        }
+    }
 }

@@ -4,4 +4,3 @@ if [ "$1" == '' ]; then
 fi
 
 echo "jtranscVersion=$1" > gradle.properties
-mvn versions:set -DnewVersion=$1

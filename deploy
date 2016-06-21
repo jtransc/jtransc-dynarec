@@ -1,2 +1,1 @@
-#mvn clean release:perform
-mvn clean deploy -Dgpg.passphrase=$1 -DperformRelease=true
+gradle install uploadArchives
