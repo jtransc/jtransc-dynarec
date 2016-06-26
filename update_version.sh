@@ -3,4 +3,4 @@ if [ "$1" == '' ]; then
 	exit 1;
 fi
 
-echo "jtranscVersion=$1" > gradle.properties
+sed -i -e "s/jtranscVersion=\(.*\)/jtranscVersion=$1/g" gradle.properties
