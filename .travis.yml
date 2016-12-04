@@ -1,4 +1,8 @@
 language: java
 
 jdk:
-  - oraclejdk8
+- oraclejdk8
+script:
+- gradle check
+- gradle run
+- gradle runJs
