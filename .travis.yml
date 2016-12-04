@@ -2,8 +2,9 @@ language: java
 
 jdk:
   - oraclejdk8
-node_js:
-  - "6"
+install:
+  - nvm install 4 || true
+  - nvm use 4 || true
 script:
   - gradle check
   - gradle run
