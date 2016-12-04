@@ -22,7 +22,7 @@ public class PhpCompiler extends FunctionCompiler {
 	}
 
 	// @TODO: Instead of evaluating every time, generate the function and return it!
-	@HaxeMethodBody(target = "php", value = "return HaxeNatives.box(untyped __php__('eval({0})', p0._str));")
+	@HaxeMethodBody(target = "php", value = "return N.box(untyped __php__('eval({0})', p0._str));")
 	native static private Object eval(String str);
 
 	static private class Impl extends AstVisitor {

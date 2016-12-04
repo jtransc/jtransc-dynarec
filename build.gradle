@@ -10,10 +10,10 @@ mainClassName = "com.jtransc.dynarec.example.BrainfuckDynarec"
 group = "com.jtransc"
 version = "${jtranscVersion}"
 
-sourceSets.main {
-    java {
-        srcDirs = ['src']
-    }
+sourceSets {
+    main.java.srcDirs = [ 'src' ]
+    main.resources.srcDirs = [ 'resources' ]
+    test.java.srcDirs = [ 'test' ]
 }
 
 buildscript {
@@ -33,7 +33,7 @@ repositories {
 
 dependencies {
     compile "com.jtransc:jtransc-rt-core:${jtranscVersion}"
-    compile 'org.ow2.asm:asm-all:5.0.3'
+    compile 'org.ow2.asm:asm-all:5.1'
     testCompile 'junit:junit:4.12'
 }
 
@@ -49,6 +49,11 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
     classifier = 'sources'
+}
+
+jtransc {
+    minimizeNames = true
+    treeshaking = true
 }
 
 artifacts {
