@@ -1,3 +1,13 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.jtransc:jtransc-gradle-plugin:${jtranscVersion}"
+    }
+}
+
 apply plugin: "java"
 apply plugin: 'application'
 apply plugin: "jtransc"
@@ -16,16 +26,6 @@ sourceSets {
     test.java.srcDirs = [ 'test' ]
 }
 
-buildscript {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-    }
-    dependencies {
-        classpath "com.jtransc:jtransc-gradle-plugin:${jtranscVersion}"
-    }
-}
-
 repositories {
     mavenLocal()
     mavenCentral()
@@ -37,68 +37,66 @@ dependencies {
     testCompile 'junit:junit:4.12'
 }
 
+if (System.getenv("CI") == null) {
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+        classifier = 'javadoc'
+        from 'build/docs/javadoc'
+    }
 
-//////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////
+    task sourcesJar(type: Jar) {
+        from sourceSets.main.allSource
+        classifier = 'sources'
+    }
 
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from 'build/docs/javadoc'
-}
+    jtransc {
+        minimizeNames = true
+        treeshaking = true
+    }
 
-task sourcesJar(type: Jar) {
-    from sourceSets.main.allSource
-    classifier = 'sources'
-}
+    artifacts {
+        archives jar
+        archives javadocJar
+        archives sourcesJar
+    }
 
-jtransc {
-    minimizeNames = true
-    treeshaking = true
-}
+    signing {
+        sign configurations.archives
+    }
 
-artifacts {
-    archives jar
-    archives javadocJar
-    archives sourcesJar
-}
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-signing {
-    sign configurations.archives
-}
-
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
-                authentication(userName: sonatypeUsername, password: sonatypePassword)
-            }
-
-            pom.project {
-                name "${project.name}"
-                packaging 'jar'
-                description 'JVM AOT compiler currently generating Javascript and Haxe, with initial focus on Kotlin and games.'
-                url 'https://github.com/jtransc/jtransc-media/'
-
-                scm {
-                    url 'scm:git@github.com:jtransc/jtransc-media.git'
-                    connection 'scm:git@github.com:jtransc/jtransc-media.git'
-                    developerConnection 'scm:git@github.com:jtransc/jtransc-media.git'
+                repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                    authentication(userName: sonatypeUsername, password: sonatypePassword)
                 }
 
-                licenses {
-                    license {
-                        name 'The Apache Software License, Version 2.0'
-                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                        distribution 'repo'
+                pom.project {
+                    name "${project.name}"
+                    packaging 'jar'
+                    description 'JVM AOT compiler currently generating Javascript and Haxe, with initial focus on Kotlin and games.'
+                    url 'https://github.com/jtransc/jtransc-media/'
+
+                    scm {
+                        url 'scm:git@github.com:jtransc/jtransc-media.git'
+                        connection 'scm:git@github.com:jtransc/jtransc-media.git'
+                        developerConnection 'scm:git@github.com:jtransc/jtransc-media.git'
                     }
-                }
 
-                developers {
-                    developer {
-                        id 'soywiz'
-                        name 'Carlos Ballesteros Velasco'
+                    licenses {
+                        license {
+                            name 'The Apache Software License, Version 2.0'
+                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            distribution 'repo'
+                        }
+                    }
+
+                    developers {
+                        developer {
+                            id 'soywiz'
+                            name 'Carlos Ballesteros Velasco'
+                        }
                     }
                 }
             }
